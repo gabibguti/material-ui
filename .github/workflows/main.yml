@@ -1,0 +1,29 @@
+# need to set npm token on repo
+
+# run-name: Deploy ${{ output of get-tag }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        type: string
+        required: true
+
+env:
+  NPM_CONFIG_PROVENANCE: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
+        with:
+          ref: ${{ inputs.commit }}
+      - name: Release
+        run: |
+          yarn
+          yarn release:build
+          yarn release:publish
+          yarn release:tag
+          yarn docs:deploy
